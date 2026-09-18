@@ -56,7 +56,7 @@ export default function SimChart() {
       fontFamily: "'Segoe UI', sans-serif", padding: "20px 16px"
     }}>
       <h2 style={{ textAlign: "center", margin: "0 0 4px", fontSize: 18, color: "#7ecfff", letterSpacing: 1 }}>
-        SPH流体シミュレーション 診断データ (240 frames)
+        SPH流体シミュレーション (240 frames)
       </h2>
       <p style={{ textAlign: "center", margin: "0 0 18px", fontSize: 12, color: "#888" }}>
         PCISPH + Monaghan粘性 + 適応タイムステップ
