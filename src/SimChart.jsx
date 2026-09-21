@@ -1,380 +1,246 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer, ReferenceLine
 } from "recharts";
 
+// ── データ ────────────────────────────────────────────────────────────────────
 const RAW = [{"frame":0,"density_max":662.298,"pressure":null,"viscosity":0.000463825,"surfaceTension":0.000530361,"adhesion":null},{"frame":1,"density_max":1000.01,"pressure":0.000139824,"viscosity":0.000322009,"surfaceTension":0.000439536,"adhesion":null},{"frame":2,"density_max":1000.09,"pressure":0.00127176,"viscosity":0.000414357,"surfaceTension":0.000537992,"adhesion":null},{"frame":3,"density_max":1000.1,"pressure":0.00183212,"viscosity":0.000466932,"surfaceTension":0.000510085,"adhesion":null},{"frame":4,"density_max":1000.18,"pressure":0.0022946,"viscosity":0.000372953,"surfaceTension":0.000567317,"adhesion":null},{"frame":5,"density_max":1000.29,"pressure":0.00208138,"viscosity":0.000338815,"surfaceTension":0.000624298,"adhesion":null},{"frame":6,"density_max":1152.05,"pressure":0.01323,"viscosity":0.00209432,"surfaceTension":0.000621448,"adhesion":3.83635e-05},{"frame":7,"density_max":1349.93,"pressure":0.01323,"viscosity":0.00170693,"surfaceTension":0.000635409,"adhesion":4.40515e-05},{"frame":8,"density_max":1238.48,"pressure":0.01323,"viscosity":0.00216271,"surfaceTension":0.000607877,"adhesion":4.31392e-05},{"frame":9,"density_max":1336.91,"pressure":0.01323,"viscosity":0.00297795,"surfaceTension":0.000654828,"adhesion":4.36646e-05},{"frame":10,"density_max":1412.41,"pressure":0.01323,"viscosity":0.00280218,"surfaceTension":0.000674655,"adhesion":4.19183e-05},{"frame":11,"density_max":1341.72,"pressure":0.01323,"viscosity":0.00292747,"surfaceTension":0.000631605,"adhesion":4.41988e-05},{"frame":12,"density_max":1335.03,"pressure":0.01323,"viscosity":0.00250004,"surfaceTension":0.000684065,"adhesion":4.53455e-05},{"frame":13,"density_max":1250.26,"pressure":0.01323,"viscosity":0.00278403,"surfaceTension":0.000629017,"adhesion":4.5687e-05},{"frame":14,"density_max":1213.2,"pressure":0.01323,"viscosity":0.00314676,"surfaceTension":0.000595563,"adhesion":4.5537e-05},{"frame":15,"density_max":1251.38,"pressure":0.01323,"viscosity":0.00386143,"surfaceTension":0.000586728,"adhesion":4.48089e-05},{"frame":16,"density_max":1300.26,"pressure":0.01323,"viscosity":0.00305926,"surfaceTension":0.000684285,"adhesion":4.55076e-05},{"frame":17,"density_max":1311.11,"pressure":0.01323,"viscosity":0.00403493,"surfaceTension":0.000637102,"adhesion":4.52e-05},{"frame":18,"density_max":1271.57,"pressure":0.01323,"viscosity":0.00205806,"surfaceTension":0.000637134,"adhesion":4.51078e-05},{"frame":19,"density_max":1148.89,"pressure":0.01323,"viscosity":0.00310739,"surfaceTension":0.000669559,"adhesion":4.35836e-05},{"frame":20,"density_max":1325.12,"pressure":0.01323,"viscosity":0.00228045,"surfaceTension":0.000611694,"adhesion":4.54667e-05},{"frame":21,"density_max":1397.16,"pressure":0.01323,"viscosity":0.00326478,"surfaceTension":0.000675413,"adhesion":4.50511e-05},{"frame":22,"density_max":1312.34,"pressure":0.01323,"viscosity":0.00279018,"surfaceTension":0.000655337,"adhesion":4.51953e-05},{"frame":23,"density_max":1323.77,"pressure":0.01323,"viscosity":0.00362547,"surfaceTension":0.00061328,"adhesion":4.64364e-05},{"frame":24,"density_max":1081.17,"pressure":0.01323,"viscosity":0.00226595,"surfaceTension":0.000666016,"adhesion":4.55195e-05},{"frame":25,"density_max":1143.77,"pressure":0.01323,"viscosity":0.00221555,"surfaceTension":0.000672713,"adhesion":4.56954e-05},{"frame":26,"density_max":1090.19,"pressure":0.01323,"viscosity":0.00489269,"surfaceTension":0.000666576,"adhesion":4.6819e-05},{"frame":27,"density_max":1159.78,"pressure":0.01323,"viscosity":0.00344236,"surfaceTension":0.000630134,"adhesion":4.60054e-05},{"frame":28,"density_max":1156.16,"pressure":0.01323,"viscosity":0.00221766,"surfaceTension":0.000657197,"adhesion":4.53708e-05},{"frame":29,"density_max":1142.42,"pressure":0.01323,"viscosity":0.00184268,"surfaceTension":0.00060699,"adhesion":4.53938e-05},{"frame":30,"density_max":1056.38,"pressure":0.01323,"viscosity":0.00193148,"surfaceTension":0.000672956,"adhesion":4.65325e-05},{"frame":31,"density_max":1083.02,"pressure":0.01323,"viscosity":0.00231517,"surfaceTension":0.000644507,"adhesion":4.42371e-05},{"frame":32,"density_max":1052.76,"pressure":0.01323,"viscosity":0.00237877,"surfaceTension":0.000656508,"adhesion":4.51356e-05},{"frame":33,"density_max":1064.41,"pressure":0.01323,"viscosity":0.00163397,"surfaceTension":0.000726115,"adhesion":4.52295e-05},{"frame":34,"density_max":1069.1,"pressure":0.01323,"viscosity":0.00250082,"surfaceTension":0.000640117,"adhesion":4.49197e-05},{"frame":35,"density_max":1031.81,"pressure":0.01323,"viscosity":0.00167559,"surfaceTension":0.000676669,"adhesion":4.49459e-05},{"frame":36,"density_max":1210.3,"pressure":0.01323,"viscosity":0.00189272,"surfaceTension":0.000633847,"adhesion":4.63823e-05},{"frame":37,"density_max":1017.07,"pressure":0.01323,"viscosity":0.0023321,"surfaceTension":0.00067617,"adhesion":4.56516e-05},{"frame":38,"density_max":1055.31,"pressure":0.01323,"viscosity":0.00237909,"surfaceTension":0.000654335,"adhesion":4.41911e-05},{"frame":39,"density_max":1000.85,"pressure":0.01323,"viscosity":0.00136263,"surfaceTension":0.00065995,"adhesion":4.58955e-05},{"frame":40,"density_max":1053.0,"pressure":0.01323,"viscosity":0.00129608,"surfaceTension":0.000684758,"adhesion":4.46737e-05},{"frame":41,"density_max":1066.19,"pressure":0.01323,"viscosity":0.00186292,"surfaceTension":0.000649574,"adhesion":4.4469e-05},{"frame":42,"density_max":1000.71,"pressure":0.01323,"viscosity":0.00152065,"surfaceTension":0.000727347,"adhesion":4.49505e-05},{"frame":43,"density_max":1060.06,"pressure":0.01323,"viscosity":0.00164727,"surfaceTension":0.000663733,"adhesion":4.46819e-05},{"frame":44,"density_max":1163.26,"pressure":0.01323,"viscosity":0.00223242,"surfaceTension":0.000635195,"adhesion":4.45988e-05},{"frame":45,"density_max":1042.47,"pressure":0.01323,"viscosity":0.00165723,"surfaceTension":0.000627983,"adhesion":4.57143e-05},{"frame":46,"density_max":1004.09,"pressure":0.01323,"viscosity":0.00141806,"surfaceTension":0.000663644,"adhesion":4.53956e-05},{"frame":47,"density_max":1140.5,"pressure":0.01323,"viscosity":0.00164163,"surfaceTension":0.000659666,"adhesion":4.51321e-05},{"frame":48,"density_max":1004.45,"pressure":0.01323,"viscosity":0.00141019,"surfaceTension":0.000686851,"adhesion":4.49885e-05},{"frame":49,"density_max":1050.12,"pressure":0.01323,"viscosity":0.00156865,"surfaceTension":0.000639829,"adhesion":4.65938e-05},{"frame":50,"density_max":1170.6,"pressure":0.01323,"viscosity":0.00198486,"surfaceTension":0.000745084,"adhesion":4.55633e-05},{"frame":51,"density_max":1085.49,"pressure":0.01323,"viscosity":0.00179241,"surfaceTension":0.00065519,"adhesion":4.47456e-05},{"frame":52,"density_max":1137.85,"pressure":0.01323,"viscosity":0.00123519,"surfaceTension":0.000623417,"adhesion":4.41163e-05},{"frame":53,"density_max":1078.02,"pressure":0.01323,"viscosity":0.00191466,"surfaceTension":0.000631462,"adhesion":4.53031e-05},{"frame":54,"density_max":1050.63,"pressure":0.01323,"viscosity":0.00139139,"surfaceTension":0.000702936,"adhesion":4.55253e-05},{"frame":55,"density_max":1006.33,"pressure":0.01323,"viscosity":0.00100453,"surfaceTension":0.000607237,"adhesion":4.45468e-05},{"frame":56,"density_max":1008.24,"pressure":0.01323,"viscosity":0.00145889,"surfaceTension":0.000618507,"adhesion":4.64522e-05},{"frame":57,"density_max":1040.8,"pressure":0.01323,"viscosity":0.00180187,"surfaceTension":0.00066452,"adhesion":4.4517e-05},{"frame":58,"density_max":1049.54,"pressure":0.01323,"viscosity":0.00176278,"surfaceTension":0.000630149,"adhesion":4.52939e-05},{"frame":59,"density_max":1002.81,"pressure":0.01323,"viscosity":0.00157784,"surfaceTension":0.000676095,"adhesion":4.64612e-05},{"frame":60,"density_max":1019.76,"pressure":0.01323,"viscosity":0.00114889,"surfaceTension":0.000645708,"adhesion":4.62095e-05},{"frame":61,"density_max":1209.35,"pressure":0.01323,"viscosity":0.00141698,"surfaceTension":0.00062565,"adhesion":4.52746e-05},{"frame":62,"density_max":1107.78,"pressure":0.01323,"viscosity":0.00300884,"surfaceTension":0.000578979,"adhesion":4.50669e-05},{"frame":63,"density_max":1007.92,"pressure":0.01323,"viscosity":0.00200293,"surfaceTension":0.000660028,"adhesion":4.4685e-05},{"frame":64,"density_max":1140.43,"pressure":0.01323,"viscosity":0.00159916,"surfaceTension":0.000657938,"adhesion":4.63831e-05},{"frame":65,"density_max":1000.78,"pressure":0.01323,"viscosity":0.0015504,"surfaceTension":0.000610202,"adhesion":4.62763e-05},{"frame":66,"density_max":1115.72,"pressure":0.01323,"viscosity":0.00129494,"surfaceTension":0.000651843,"adhesion":4.59948e-05},{"frame":67,"density_max":1000.81,"pressure":0.01323,"viscosity":0.00137592,"surfaceTension":0.000633976,"adhesion":4.46248e-05},{"frame":68,"density_max":1000.88,"pressure":0.01323,"viscosity":0.00163489,"surfaceTension":0.000614978,"adhesion":4.54165e-05},{"frame":69,"density_max":1000.81,"pressure":0.01323,"viscosity":0.00147176,"surfaceTension":0.000719983,"adhesion":4.41748e-05},{"frame":70,"density_max":1221.68,"pressure":0.01323,"viscosity":0.00119542,"surfaceTension":0.000648731,"adhesion":4.43088e-05},{"frame":71,"density_max":1141.63,"pressure":0.01323,"viscosity":0.00198229,"surfaceTension":0.000598217,"adhesion":4.54467e-05},{"frame":72,"density_max":1000.86,"pressure":0.01323,"viscosity":0.00133051,"surfaceTension":0.000651992,"adhesion":4.50721e-05},{"frame":73,"density_max":1008.97,"pressure":0.01323,"viscosity":0.00126709,"surfaceTension":0.000648069,"adhesion":4.45399e-05},{"frame":74,"density_max":1071.4,"pressure":0.01323,"viscosity":0.00115885,"surfaceTension":0.000648872,"adhesion":4.55139e-05},{"frame":75,"density_max":1044.06,"pressure":0.01323,"viscosity":0.00199791,"surfaceTension":0.000619855,"adhesion":4.53186e-05},{"frame":76,"density_max":1000.86,"pressure":0.01323,"viscosity":0.0012075,"surfaceTension":0.000618224,"adhesion":4.58717e-05},{"frame":77,"density_max":1019.15,"pressure":0.01323,"viscosity":0.00101377,"surfaceTension":0.000647456,"adhesion":4.57037e-05},{"frame":78,"density_max":1013.9,"pressure":0.01323,"viscosity":0.00106763,"surfaceTension":0.000698284,"adhesion":4.60394e-05},{"frame":79,"density_max":1000.87,"pressure":0.01323,"viscosity":0.00175838,"surfaceTension":0.000639038,"adhesion":4.57746e-05},{"frame":80,"density_max":1000.82,"pressure":0.01323,"viscosity":0.00139204,"surfaceTension":0.000710204,"adhesion":4.44051e-05},{"frame":81,"density_max":1035.63,"pressure":0.01323,"viscosity":0.00147402,"surfaceTension":0.000619107,"adhesion":4.58877e-05},{"frame":82,"density_max":1008.65,"pressure":0.01323,"viscosity":0.00107993,"surfaceTension":0.00063248,"adhesion":4.45558e-05},{"frame":83,"density_max":1027.11,"pressure":0.01323,"viscosity":0.00132391,"surfaceTension":0.000648237,"adhesion":4.45388e-05},{"frame":84,"density_max":1000.9,"pressure":0.01323,"viscosity":0.00121671,"surfaceTension":0.000622493,"adhesion":4.39663e-05},{"frame":85,"density_max":1000.85,"pressure":0.01323,"viscosity":0.00114482,"surfaceTension":0.000687358,"adhesion":4.44611e-05},{"frame":86,"density_max":1000.85,"pressure":0.01323,"viscosity":0.000898023,"surfaceTension":0.000669809,"adhesion":4.58361e-05},{"frame":87,"density_max":1000.83,"pressure":0.01323,"viscosity":0.00101049,"surfaceTension":0.000611045,"adhesion":4.52753e-05},{"frame":88,"density_max":1000.84,"pressure":0.01323,"viscosity":0.00112529,"surfaceTension":0.000585006,"adhesion":4.46875e-05},{"frame":89,"density_max":1164.99,"pressure":0.01323,"viscosity":0.0014985,"surfaceTension":0.000622378,"adhesion":4.44573e-05},{"frame":90,"density_max":1004.39,"pressure":0.01323,"viscosity":0.0010955,"surfaceTension":0.00067119,"adhesion":4.61514e-05},{"frame":91,"density_max":1002.54,"pressure":0.01323,"viscosity":0.00133284,"surfaceTension":0.000657558,"adhesion":4.55651e-05},{"frame":92,"density_max":1000.88,"pressure":0.01323,"viscosity":0.000904146,"surfaceTension":0.000627835,"adhesion":4.65377e-05},{"frame":93,"density_max":1000.94,"pressure":0.01323,"viscosity":0.00133682,"surfaceTension":0.000647017,"adhesion":4.45341e-05},{"frame":94,"density_max":1002.52,"pressure":0.01323,"viscosity":0.00104893,"surfaceTension":0.000699595,"adhesion":4.53452e-05},{"frame":95,"density_max":1000.87,"pressure":0.01323,"viscosity":0.000993371,"surfaceTension":0.00066819,"adhesion":4.64777e-05},{"frame":96,"density_max":1000.86,"pressure":0.01323,"viscosity":0.00148626,"surfaceTension":0.000640784,"adhesion":4.48769e-05},{"frame":97,"density_max":1000.82,"pressure":0.01323,"viscosity":0.00106834,"surfaceTension":0.000609447,"adhesion":4.62314e-05},{"frame":98,"density_max":1001.06,"pressure":0.01323,"viscosity":0.00122534,"surfaceTension":0.000670528,"adhesion":4.54765e-05},{"frame":99,"density_max":1000.81,"pressure":0.01323,"viscosity":0.00099462,"surfaceTension":0.000728993,"adhesion":4.50329e-05},{"frame":100,"density_max":1000.83,"pressure":0.01323,"viscosity":0.00098979,"surfaceTension":0.000605134,"adhesion":4.58864e-05},{"frame":101,"density_max":1000.85,"pressure":0.01323,"viscosity":0.00131045,"surfaceTension":0.000673951,"adhesion":4.65731e-05},{"frame":102,"density_max":1000.88,"pressure":0.01323,"viscosity":0.00119082,"surfaceTension":0.000589467,"adhesion":4.49994e-05},{"frame":103,"density_max":1033.76,"pressure":0.01323,"viscosity":0.00119771,"surfaceTension":0.000645319,"adhesion":4.46205e-05},{"frame":104,"density_max":1003.6,"pressure":0.01323,"viscosity":0.000908624,"surfaceTension":0.000599373,"adhesion":4.47154e-05},{"frame":105,"density_max":1002.08,"pressure":0.01323,"viscosity":0.000905774,"surfaceTension":0.000597576,"adhesion":4.54492e-05},{"frame":106,"density_max":1000.92,"pressure":0.01323,"viscosity":0.00112321,"surfaceTension":0.000608974,"adhesion":4.55906e-05},{"frame":107,"density_max":1048.75,"pressure":0.01323,"viscosity":0.000849195,"surfaceTension":0.000701823,"adhesion":4.5911e-05},{"frame":108,"density_max":1001.55,"pressure":0.01323,"viscosity":0.00099203,"surfaceTension":0.000683094,"adhesion":4.59291e-05},{"frame":109,"density_max":1000.91,"pressure":0.01323,"viscosity":0.00109986,"surfaceTension":0.00061787,"adhesion":4.61939e-05},{"frame":110,"density_max":1013.88,"pressure":0.01323,"viscosity":0.00122782,"surfaceTension":0.000595353,"adhesion":4.6482e-05},{"frame":111,"density_max":1000.94,"pressure":0.01323,"viscosity":0.00125061,"surfaceTension":0.000684107,"adhesion":4.47839e-05},{"frame":112,"density_max":1000.86,"pressure":0.01323,"viscosity":0.00102162,"surfaceTension":0.000604851,"adhesion":4.56337e-05},{"frame":113,"density_max":1025.24,"pressure":0.01323,"viscosity":0.000929884,"surfaceTension":0.000580763,"adhesion":4.47368e-05},{"frame":114,"density_max":1000.9,"pressure":0.01323,"viscosity":0.00121839,"surfaceTension":0.000694284,"adhesion":4.56691e-05},{"frame":115,"density_max":1000.91,"pressure":0.01323,"viscosity":0.000915393,"surfaceTension":0.000627452,"adhesion":4.6634e-05},{"frame":116,"density_max":1000.92,"pressure":0.01323,"viscosity":0.00119386,"surfaceTension":0.000602531,"adhesion":4.60904e-05},{"frame":117,"density_max":1000.94,"pressure":0.01323,"viscosity":0.000885839,"surfaceTension":0.000626966,"adhesion":4.61727e-05},{"frame":118,"density_max":1000.93,"pressure":0.01323,"viscosity":0.00106129,"surfaceTension":0.000628725,"adhesion":4.50764e-05},{"frame":119,"density_max":1001.01,"pressure":0.01323,"viscosity":0.000786554,"surfaceTension":0.000577056,"adhesion":4.47604e-05},{"frame":120,"density_max":1000.91,"pressure":0.01323,"viscosity":0.00084631,"surfaceTension":0.000622939,"adhesion":4.6232e-05},{"frame":121,"density_max":1000.94,"pressure":0.01323,"viscosity":0.00123533,"surfaceTension":0.000674526,"adhesion":4.43737e-05},{"frame":122,"density_max":1000.94,"pressure":0.01323,"viscosity":0.00120528,"surfaceTension":0.000596738,"adhesion":4.4911e-05},{"frame":123,"density_max":1000.91,"pressure":0.01323,"viscosity":0.000862233,"surfaceTension":0.000601233,"adhesion":4.62544e-05},{"frame":124,"density_max":1000.94,"pressure":0.01323,"viscosity":0.000885431,"surfaceTension":0.000661673,"adhesion":4.51355e-05},{"frame":125,"density_max":1000.95,"pressure":0.01323,"viscosity":0.000976616,"surfaceTension":0.000582958,"adhesion":4.6473e-05},{"frame":126,"density_max":1003.24,"pressure":0.01323,"viscosity":0.00101405,"surfaceTension":0.000591857,"adhesion":4.66589e-05},{"frame":127,"density_max":1000.94,"pressure":0.01323,"viscosity":0.000966198,"surfaceTension":0.000666253,"adhesion":4.50878e-05},{"frame":128,"density_max":1000.94,"pressure":0.01323,"viscosity":0.00107647,"surfaceTension":0.000602644,"adhesion":4.60577e-05},{"frame":129,"density_max":1000.93,"pressure":0.01323,"viscosity":0.00072069,"surfaceTension":0.000672651,"adhesion":4.64792e-05},{"frame":130,"density_max":1000.92,"pressure":0.01323,"viscosity":0.00106294,"surfaceTension":0.000607714,"adhesion":4.54256e-05},{"frame":131,"density_max":1000.89,"pressure":0.01323,"viscosity":0.00198221,"surfaceTension":0.000609025,"adhesion":4.57475e-05},{"frame":132,"density_max":1000.91,"pressure":0.01323,"viscosity":0.00082375,"surfaceTension":0.00064415,"adhesion":4.63766e-05},{"frame":133,"density_max":1000.9,"pressure":0.01323,"viscosity":0.000878212,"surfaceTension":0.00065024,"adhesion":4.53732e-05},{"frame":134,"density_max":1000.95,"pressure":0.01323,"viscosity":0.00130044,"surfaceTension":0.000624165,"adhesion":4.42331e-05},{"frame":135,"density_max":1005.25,"pressure":0.0125713,"viscosity":0.000788465,"surfaceTension":0.000680297,"adhesion":4.5414e-05},{"frame":136,"density_max":1000.94,"pressure":0.01323,"viscosity":0.00153528,"surfaceTension":0.000637651,"adhesion":4.58513e-05},{"frame":137,"density_max":1000.94,"pressure":0.01323,"viscosity":0.00112628,"surfaceTension":0.000645506,"adhesion":4.56938e-05},{"frame":138,"density_max":1000.95,"pressure":0.01323,"viscosity":0.000959325,"surfaceTension":0.000658486,"adhesion":4.51927e-05},{"frame":139,"density_max":1000.94,"pressure":0.01323,"viscosity":0.00088411,"surfaceTension":0.000616341,"adhesion":4.56255e-05},{"frame":140,"density_max":1000.94,"pressure":0.01323,"viscosity":0.000927568,"surfaceTension":0.000561756,"adhesion":4.55624e-05},{"frame":141,"density_max":1000.93,"pressure":0.01323,"viscosity":0.0010404,"surfaceTension":0.000654045,"adhesion":4.6289e-05},{"frame":142,"density_max":1000.92,"pressure":0.01323,"viscosity":0.00154454,"surfaceTension":0.000632319,"adhesion":4.44416e-05},{"frame":143,"density_max":1000.94,"pressure":0.01323,"viscosity":0.000752034,"surfaceTension":0.000607063,"adhesion":4.63282e-05},{"frame":144,"density_max":1000.92,"pressure":0.01323,"viscosity":0.00106498,"surfaceTension":0.000646968,"adhesion":4.56147e-05},{"frame":145,"density_max":1000.95,"pressure":0.01323,"viscosity":0.00118112,"surfaceTension":0.000617315,"adhesion":4.59112e-05},{"frame":146,"density_max":1000.95,"pressure":0.01323,"viscosity":0.00105477,"surfaceTension":0.00061459,"adhesion":4.66169e-05},{"frame":147,"density_max":1007.52,"pressure":0.01323,"viscosity":0.00100374,"surfaceTension":0.000692343,"adhesion":4.52556e-05},{"frame":148,"density_max":1000.94,"pressure":0.01323,"viscosity":0.000752381,"surfaceTension":0.000636856,"adhesion":4.5576e-05},{"frame":149,"density_max":1000.93,"pressure":0.01323,"viscosity":0.00110242,"surfaceTension":0.000620765,"adhesion":4.49494e-05},{"frame":150,"density_max":1000.95,"pressure":0.01323,"viscosity":0.00126833,"surfaceTension":0.000575848,"adhesion":4.65033e-05},{"frame":151,"density_max":1000.95,"pressure":0.01323,"viscosity":0.00073535,"surfaceTension":0.000647646,"adhesion":4.59875e-05},{"frame":152,"density_max":1000.93,"pressure":0.01323,"viscosity":0.00108761,"surfaceTension":0.000637622,"adhesion":4.60983e-05},{"frame":153,"density_max":1001.48,"pressure":0.01323,"viscosity":0.00131538,"surfaceTension":0.000692178,"adhesion":4.54548e-05},{"frame":154,"density_max":1001.37,"pressure":0.01323,"viscosity":0.00105205,"surfaceTension":0.000686779,"adhesion":4.58762e-05},{"frame":155,"density_max":1000.91,"pressure":0.01323,"viscosity":0.00101156,"surfaceTension":0.000577656,"adhesion":4.57647e-05},{"frame":156,"density_max":1000.95,"pressure":0.01323,"viscosity":0.000776434,"surfaceTension":0.000633954,"adhesion":4.51274e-05},{"frame":157,"density_max":1004.51,"pressure":0.01323,"viscosity":0.000825209,"surfaceTension":0.000636473,"adhesion":4.55679e-05},{"frame":158,"density_max":1001.94,"pressure":0.01323,"viscosity":0.000935083,"surfaceTension":0.000557953,"adhesion":4.61697e-05},{"frame":159,"density_max":1000.93,"pressure":0.01323,"viscosity":0.000797295,"surfaceTension":0.000574037,"adhesion":4.52111e-05},{"frame":160,"density_max":1006.19,"pressure":0.01323,"viscosity":0.000957174,"surfaceTension":0.000621502,"adhesion":4.53821e-05},{"frame":161,"density_max":1000.93,"pressure":0.01323,"viscosity":0.000818606,"surfaceTension":0.000647609,"adhesion":4.59582e-05},{"frame":162,"density_max":1000.93,"pressure":0.01323,"viscosity":0.000752127,"surfaceTension":0.000626218,"adhesion":4.59646e-05},{"frame":163,"density_max":1001.4,"pressure":0.01323,"viscosity":0.000833984,"surfaceTension":0.000581542,"adhesion":4.63917e-05},{"frame":164,"density_max":1001.04,"pressure":0.01323,"viscosity":0.000854965,"surfaceTension":0.000608354,"adhesion":4.6464e-05},{"frame":165,"density_max":1000.93,"pressure":0.01323,"viscosity":0.00115644,"surfaceTension":0.000608904,"adhesion":4.57842e-05},{"frame":166,"density_max":1001.21,"pressure":0.01323,"viscosity":0.000895393,"surfaceTension":0.000652415,"adhesion":4.59579e-05},{"frame":167,"density_max":1007.51,"pressure":0.01323,"viscosity":0.000998644,"surfaceTension":0.000680531,"adhesion":4.58624e-05},{"frame":168,"density_max":1000.95,"pressure":0.01323,"viscosity":0.00107182,"surfaceTension":0.000648377,"adhesion":4.57936e-05},{"frame":169,"density_max":1000.93,"pressure":0.01323,"viscosity":0.00094564,"surfaceTension":0.000662372,"adhesion":4.45169e-05},{"frame":170,"density_max":1000.96,"pressure":0.01323,"viscosity":0.00119698,"surfaceTension":0.000575117,"adhesion":4.58037e-05},{"frame":171,"density_max":1000.96,"pressure":0.01323,"viscosity":0.00082571,"surfaceTension":0.000623505,"adhesion":4.56192e-05},{"frame":172,"density_max":1001.28,"pressure":0.01323,"viscosity":0.000661267,"surfaceTension":0.000614942,"adhesion":4.60675e-05},{"frame":173,"density_max":1001.15,"pressure":0.01323,"viscosity":0.00114015,"surfaceTension":0.000618492,"adhesion":4.58517e-05},{"frame":174,"density_max":1000.95,"pressure":0.01323,"viscosity":0.000799202,"surfaceTension":0.000578517,"adhesion":4.66777e-05},{"frame":175,"density_max":1000.94,"pressure":0.01323,"viscosity":0.000929334,"surfaceTension":0.000649009,"adhesion":4.67918e-05},{"frame":176,"density_max":1000.92,"pressure":0.01323,"viscosity":0.0010795,"surfaceTension":0.000619894,"adhesion":4.51544e-05},{"frame":177,"density_max":1001.1,"pressure":0.01323,"viscosity":0.000638852,"surfaceTension":0.000631279,"adhesion":4.67127e-05},{"frame":178,"density_max":1000.95,"pressure":0.01323,"viscosity":0.000834108,"surfaceTension":0.000611279,"adhesion":4.57076e-05},{"frame":179,"density_max":1000.98,"pressure":0.01323,"viscosity":0.000727431,"surfaceTension":0.000620828,"adhesion":4.59459e-05},{"frame":180,"density_max":1000.96,"pressure":0.01323,"viscosity":0.000927461,"surfaceTension":0.000603075,"adhesion":4.60855e-05},{"frame":181,"density_max":1000.94,"pressure":0.01323,"viscosity":0.000723198,"surfaceTension":0.000603369,"adhesion":4.50826e-05},{"frame":182,"density_max":1000.93,"pressure":0.01323,"viscosity":0.000927845,"surfaceTension":0.000648339,"adhesion":4.6003e-05},{"frame":183,"density_max":1001.72,"pressure":0.01323,"viscosity":0.00077328,"surfaceTension":0.000571081,"adhesion":4.57168e-05},{"frame":184,"density_max":1003.08,"pressure":0.01323,"viscosity":0.000836332,"surfaceTension":0.000586498,"adhesion":4.60861e-05},{"frame":185,"density_max":1000.94,"pressure":0.01323,"viscosity":0.00075455,"surfaceTension":0.000592136,"adhesion":4.48591e-05},{"frame":186,"density_max":1002.0,"pressure":0.01323,"viscosity":0.000822097,"surfaceTension":0.00061454,"adhesion":4.55086e-05},{"frame":187,"density_max":1001.03,"pressure":0.01323,"viscosity":0.00096761,"surfaceTension":0.000578873,"adhesion":4.49307e-05},{"frame":188,"density_max":1001.1,"pressure":0.01323,"viscosity":0.000876441,"surfaceTension":0.000613265,"adhesion":4.63393e-05},{"frame":189,"density_max":1001.37,"pressure":0.01323,"viscosity":0.000872952,"surfaceTension":0.000581287,"adhesion":4.6752e-05},{"frame":190,"density_max":1003.36,"pressure":0.01323,"viscosity":0.00074742,"surfaceTension":0.000668345,"adhesion":4.51706e-05},{"frame":191,"density_max":1000.95,"pressure":0.01323,"viscosity":0.000817747,"surfaceTension":0.000591086,"adhesion":4.54258e-05},{"frame":192,"density_max":1001.58,"pressure":0.01323,"viscosity":0.000786668,"surfaceTension":0.000585684,"adhesion":4.57618e-05},{"frame":193,"density_max":1002.03,"pressure":0.01323,"viscosity":0.000990228,"surfaceTension":0.000617258,"adhesion":4.44992e-05},{"frame":194,"density_max":1001.06,"pressure":0.01323,"viscosity":0.000882194,"surfaceTension":0.000586715,"adhesion":4.48479e-05},{"frame":195,"density_max":1000.96,"pressure":0.01323,"viscosity":0.000940468,"surfaceTension":0.000565326,"adhesion":4.53561e-05},{"frame":196,"density_max":1001.37,"pressure":0.01323,"viscosity":0.000696289,"surfaceTension":0.000569259,"adhesion":4.50497e-05},{"frame":197,"density_max":1003.21,"pressure":0.01323,"viscosity":0.00121257,"surfaceTension":0.00061321,"adhesion":4.65961e-05},{"frame":198,"density_max":1012.72,"pressure":0.01323,"viscosity":0.000702289,"surfaceTension":0.000601266,"adhesion":4.49867e-05},{"frame":199,"density_max":1000.96,"pressure":0.01323,"viscosity":0.00101638,"surfaceTension":0.000592828,"adhesion":4.48912e-05},{"frame":200,"density_max":1001.02,"pressure":0.01323,"viscosity":0.000987261,"surfaceTension":0.000660126,"adhesion":4.5878e-05},{"frame":201,"density_max":1001.43,"pressure":0.01323,"viscosity":0.000811606,"surfaceTension":0.000652779,"adhesion":4.52033e-05},{"frame":202,"density_max":1001.77,"pressure":0.01323,"viscosity":0.00100891,"surfaceTension":0.000557461,"adhesion":4.56627e-05},{"frame":203,"density_max":1000.95,"pressure":0.01323,"viscosity":0.000903508,"surfaceTension":0.000586973,"adhesion":4.64753e-05},{"frame":204,"density_max":1001.24,"pressure":0.01323,"viscosity":0.000976127,"surfaceTension":0.000609604,"adhesion":4.61069e-05},{"frame":205,"density_max":1000.93,"pressure":0.01323,"viscosity":0.00087473,"surfaceTension":0.000598002,"adhesion":4.64124e-05},{"frame":206,"density_max":1001.23,"pressure":0.01323,"viscosity":0.00078877,"surfaceTension":0.000571235,"adhesion":4.64034e-05},{"frame":207,"density_max":1005.92,"pressure":0.01323,"viscosity":0.00068785,"surfaceTension":0.000565974,"adhesion":4.46482e-05},{"frame":208,"density_max":1000.94,"pressure":0.01323,"viscosity":0.000694559,"surfaceTension":0.000599966,"adhesion":4.52896e-05},{"frame":209,"density_max":1000.97,"pressure":0.01323,"viscosity":0.000961701,"surfaceTension":0.00059301,"adhesion":4.48932e-05},{"frame":210,"density_max":1001.09,"pressure":0.01323,"viscosity":0.000927833,"surfaceTension":0.000537182,"adhesion":4.62469e-05},{"frame":211,"density_max":1000.94,"pressure":0.0127678,"viscosity":0.000804859,"surfaceTension":0.000657584,"adhesion":4.61511e-05},{"frame":212,"density_max":1000.97,"pressure":0.01323,"viscosity":0.000976327,"surfaceTension":0.000641982,"adhesion":4.51072e-05},{"frame":213,"density_max":1000.97,"pressure":0.01323,"viscosity":0.000619405,"surfaceTension":0.000614005,"adhesion":4.57306e-05},{"frame":214,"density_max":1006.13,"pressure":0.01323,"viscosity":0.000753949,"surfaceTension":0.000585649,"adhesion":4.51549e-05},{"frame":215,"density_max":1000.95,"pressure":0.01323,"viscosity":0.000816109,"surfaceTension":0.000576595,"adhesion":4.56396e-05},{"frame":216,"density_max":1001.45,"pressure":0.01323,"viscosity":0.000787151,"surfaceTension":0.000573315,"adhesion":4.59386e-05},{"frame":217,"density_max":1002.43,"pressure":0.01323,"viscosity":0.000943541,"surfaceTension":0.000550296,"adhesion":4.64059e-05},{"frame":218,"density_max":1002.81,"pressure":0.01323,"viscosity":0.000951063,"surfaceTension":0.000542138,"adhesion":4.55554e-05},{"frame":219,"density_max":1015.0,"pressure":0.01323,"viscosity":0.000913107,"surfaceTension":0.000571186,"adhesion":4.61299e-05},{"frame":220,"density_max":1002.91,"pressure":0.01323,"viscosity":0.000912078,"surfaceTension":0.00062368,"adhesion":4.59268e-05},{"frame":221,"density_max":1003.42,"pressure":0.01323,"viscosity":0.00146451,"surfaceTension":0.000600685,"adhesion":4.5259e-05},{"frame":222,"density_max":1003.39,"pressure":0.01323,"viscosity":0.00111442,"surfaceTension":0.000586289,"adhesion":4.5456e-05},{"frame":223,"density_max":1003.78,"pressure":0.01323,"viscosity":0.000762243,"surfaceTension":0.000658391,"adhesion":4.57774e-05},{"frame":224,"density_max":1001.52,"pressure":0.01323,"viscosity":0.000767266,"surfaceTension":0.00060503,"adhesion":4.5307e-05},{"frame":225,"density_max":1001.28,"pressure":0.01323,"viscosity":0.000997672,"surfaceTension":0.000566302,"adhesion":4.58115e-05},{"frame":226,"density_max":1001.33,"pressure":0.01323,"viscosity":0.000732281,"surfaceTension":0.000555688,"adhesion":4.56624e-05},{"frame":227,"density_max":1004.69,"pressure":0.01323,"viscosity":0.000888156,"surfaceTension":0.000575029,"adhesion":4.60639e-05},{"frame":228,"density_max":1002.43,"pressure":0.01323,"viscosity":0.000980562,"surfaceTension":0.000554673,"adhesion":4.62241e-05},{"frame":229,"density_max":1002.16,"pressure":0.01323,"viscosity":0.00100545,"surfaceTension":0.000596058,"adhesion":4.55612e-05},{"frame":230,"density_max":1008.72,"pressure":0.01323,"viscosity":0.000907939,"surfaceTension":0.000559381,"adhesion":4.54352e-05},{"frame":231,"density_max":1003.42,"pressure":0.01323,"viscosity":0.000910147,"surfaceTension":0.000552182,"adhesion":4.5792e-05},{"frame":232,"density_max":1002.23,"pressure":0.01323,"viscosity":0.00106122,"surfaceTension":0.000563978,"adhesion":4.67772e-05},{"frame":233,"density_max":1001.98,"pressure":0.01323,"viscosity":0.000849727,"surfaceTension":0.000567722,"adhesion":4.65395e-05},{"frame":234,"density_max":1007.3,"pressure":0.01323,"viscosity":0.000767274,"surfaceTension":0.000560932,"adhesion":4.565e-05},{"frame":235,"density_max":1001.36,"pressure":0.01323,"viscosity":0.00086218,"surfaceTension":0.000598945,"adhesion":4.531e-05},{"frame":236,"density_max":1008.62,"pressure":0.01323,"viscosity":0.000854243,"surfaceTension":0.000570438,"adhesion":4.44906e-05},{"frame":237,"density_max":1001.71,"pressure":0.01323,"viscosity":0.000825325,"surfaceTension":0.000555736,"adhesion":4.54696e-05},{"frame":238,"density_max":1001.65,"pressure":0.01323,"viscosity":0.00101026,"surfaceTension":0.00054101,"adhesion":4.55969e-05},{"frame":239,"density_max":1004.09,"pressure":0.01323,"viscosity":0.000972695,"surfaceTension":0.000552263,"adhesion":4.59225e-05}];
 
 const RAW_X10 = [{"frame":0,"pressure":null,"viscosity":0.000463825,"surfaceTension":0.000530361,"adhesion":null},{"frame":1,"pressure":0.000139824,"viscosity":0.000322009,"surfaceTension":0.000439536,"adhesion":null},{"frame":2,"pressure":0.00127176,"viscosity":0.000414357,"surfaceTension":0.000537992,"adhesion":null},{"frame":3,"pressure":0.00183212,"viscosity":0.000466932,"surfaceTension":0.000510085,"adhesion":null},{"frame":4,"pressure":0.0022946,"viscosity":0.000372953,"surfaceTension":0.000567317,"adhesion":null},{"frame":5,"pressure":0.00208138,"viscosity":0.000338815,"surfaceTension":0.000624298,"adhesion":null},{"frame":6,"pressure":0.01323,"viscosity":0.0021093,"surfaceTension":0.000621471,"adhesion":0.000383319},{"frame":7,"pressure":0.01323,"viscosity":0.00241245,"surfaceTension":0.000633749,"adhesion":0.000434399},{"frame":8,"pressure":0.01323,"viscosity":0.00246283,"surfaceTension":0.000598384,"adhesion":0.000413065},{"frame":9,"pressure":0.01323,"viscosity":0.00714039,"surfaceTension":0.000639986,"adhesion":0.000436329},{"frame":10,"pressure":0.01323,"viscosity":0.00185858,"surfaceTension":0.000665348,"adhesion":0.000436968},{"frame":11,"pressure":0.01323,"viscosity":0.00188205,"surfaceTension":0.000647948,"adhesion":0.000452507},{"frame":12,"pressure":0.01323,"viscosity":0.0020372,"surfaceTension":0.00064788,"adhesion":0.000460564},{"frame":13,"pressure":0.01323,"viscosity":0.00261858,"surfaceTension":0.000664373,"adhesion":0.000444496},{"frame":14,"pressure":0.01323,"viscosity":0.00225136,"surfaceTension":0.00068424,"adhesion":0.000455339},{"frame":15,"pressure":0.01323,"viscosity":0.00326188,"surfaceTension":0.000664571,"adhesion":0.000450024},{"frame":16,"pressure":0.01323,"viscosity":0.00329306,"surfaceTension":0.000681629,"adhesion":0.000442397},{"frame":17,"pressure":0.01323,"viscosity":0.00426026,"surfaceTension":0.00070387,"adhesion":0.000461558},{"frame":18,"pressure":0.01323,"viscosity":0.0029413,"surfaceTension":0.000614548,"adhesion":0.000451029},{"frame":19,"pressure":0.01323,"viscosity":0.00327953,"surfaceTension":0.000658281,"adhesion":0.000448682},{"frame":20,"pressure":0.01323,"viscosity":0.00499865,"surfaceTension":0.000678801,"adhesion":0.000457445},{"frame":21,"pressure":0.01323,"viscosity":0.00244269,"surfaceTension":0.000679381,"adhesion":0.000447495},{"frame":22,"pressure":0.01323,"viscosity":0.00341169,"surfaceTension":0.000667478,"adhesion":0.000460351},{"frame":23,"pressure":0.01323,"viscosity":0.00241024,"surfaceTension":0.00062471,"adhesion":0.000461529},{"frame":24,"pressure":0.01323,"viscosity":0.00330547,"surfaceTension":0.000626132,"adhesion":0.00045887},{"frame":25,"pressure":0.01323,"viscosity":0.0026209,"surfaceTension":0.000642743,"adhesion":0.000452518},{"frame":26,"pressure":0.01323,"viscosity":0.00278865,"surfaceTension":0.000681952,"adhesion":0.0004566},{"frame":27,"pressure":0.01323,"viscosity":0.00337256,"surfaceTension":0.00073451,"adhesion":0.000453437},{"frame":28,"pressure":0.01323,"viscosity":0.00343789,"surfaceTension":0.000747794,"adhesion":0.000452451},{"frame":29,"pressure":0.01323,"viscosity":0.00434875,"surfaceTension":0.000637069,"adhesion":0.000453273},{"frame":30,"pressure":0.01323,"viscosity":0.00241037,"surfaceTension":0.000635167,"adhesion":0.00045225},{"frame":31,"pressure":0.01323,"viscosity":0.00168822,"surfaceTension":0.000663961,"adhesion":0.000453474},{"frame":32,"pressure":0.01323,"viscosity":0.00185305,"surfaceTension":0.000635266,"adhesion":0.000455767},{"frame":33,"pressure":0.01323,"viscosity":0.00146769,"surfaceTension":0.000670444,"adhesion":0.000459774},{"frame":34,"pressure":0.01323,"viscosity":0.00168678,"surfaceTension":0.000729978,"adhesion":0.000451553},{"frame":35,"pressure":0.01323,"viscosity":0.00223765,"surfaceTension":0.000693454,"adhesion":0.000454575},{"frame":36,"pressure":0.01323,"viscosity":0.00237801,"surfaceTension":0.000648307,"adhesion":0.000451469},{"frame":37,"pressure":0.01323,"viscosity":0.00384455,"surfaceTension":0.000644125,"adhesion":0.000448148},{"frame":38,"pressure":0.01323,"viscosity":0.0014522,"surfaceTension":0.000691181,"adhesion":0.000452045},{"frame":39,"pressure":0.01323,"viscosity":0.00241484,"surfaceTension":0.000630129,"adhesion":0.000453278},{"frame":40,"pressure":0.01323,"viscosity":0.00172985,"surfaceTension":0.00061235,"adhesion":0.000454924},{"frame":41,"pressure":0.01323,"viscosity":0.00190263,"surfaceTension":0.000639375,"adhesion":0.000449904},{"frame":42,"pressure":0.01323,"viscosity":0.00176719,"surfaceTension":0.000747481,"adhesion":0.000447135},{"frame":43,"pressure":0.01323,"viscosity":0.00129742,"surfaceTension":0.000708093,"adhesion":0.000448514},{"frame":44,"pressure":0.01323,"viscosity":0.00171624,"surfaceTension":0.000672134,"adhesion":0.000450655},{"frame":45,"pressure":0.01323,"viscosity":0.00208746,"surfaceTension":0.0006666,"adhesion":0.000447564},{"frame":46,"pressure":0.01323,"viscosity":0.00203484,"surfaceTension":0.000642178,"adhesion":0.000463323},{"frame":47,"pressure":0.01323,"viscosity":0.00199563,"surfaceTension":0.000671165,"adhesion":0.000447376},{"frame":48,"pressure":0.01323,"viscosity":0.00166484,"surfaceTension":0.000689803,"adhesion":0.000462108},{"frame":49,"pressure":0.01323,"viscosity":0.00150776,"surfaceTension":0.000682774,"adhesion":0.000458126},{"frame":50,"pressure":0.01323,"viscosity":0.00153619,"surfaceTension":0.000676502,"adhesion":0.000451974},{"frame":51,"pressure":0.01323,"viscosity":0.00226635,"surfaceTension":0.000653742,"adhesion":0.000444473},{"frame":52,"pressure":0.01323,"viscosity":0.00136079,"surfaceTension":0.00060768,"adhesion":0.000451725},{"frame":53,"pressure":0.01323,"viscosity":0.00169895,"surfaceTension":0.000681737,"adhesion":0.000445417},{"frame":54,"pressure":0.01323,"viscosity":0.00222644,"surfaceTension":0.00066062,"adhesion":0.000461267},{"frame":55,"pressure":0.01323,"viscosity":0.00207838,"surfaceTension":0.000694665,"adhesion":0.000452891},{"frame":56,"pressure":0.01323,"viscosity":0.00140118,"surfaceTension":0.000637031,"adhesion":0.000456358},{"frame":57,"pressure":0.01323,"viscosity":0.00153323,"surfaceTension":0.000624432,"adhesion":0.000449105},{"frame":58,"pressure":0.01323,"viscosity":0.00147039,"surfaceTension":0.000715424,"adhesion":0.000452969},{"frame":59,"pressure":0.01323,"viscosity":0.00147362,"surfaceTension":0.000695852,"adhesion":0.000446967},{"frame":60,"pressure":0.01323,"viscosity":0.00156905,"surfaceTension":0.000628392,"adhesion":0.000445692},{"frame":61,"pressure":0.01323,"viscosity":0.00130169,"surfaceTension":0.000669813,"adhesion":0.000454891},{"frame":62,"pressure":0.01323,"viscosity":0.0016945,"surfaceTension":0.000627198,"adhesion":0.000451838},{"frame":63,"pressure":0.01323,"viscosity":0.00189131,"surfaceTension":0.000642697,"adhesion":0.000443466},{"frame":64,"pressure":0.01323,"viscosity":0.00160959,"surfaceTension":0.000639988,"adhesion":0.00045779},{"frame":65,"pressure":0.01323,"viscosity":0.00126453,"surfaceTension":0.000638372,"adhesion":0.000454101},{"frame":66,"pressure":0.01323,"viscosity":0.00169144,"surfaceTension":0.000645321,"adhesion":0.000449206},{"frame":67,"pressure":0.01323,"viscosity":0.00121421,"surfaceTension":0.000604898,"adhesion":0.000453365},{"frame":68,"pressure":0.01323,"viscosity":0.00122227,"surfaceTension":0.000685962,"adhesion":0.000449409},{"frame":69,"pressure":0.01323,"viscosity":0.00125996,"surfaceTension":0.000657585,"adhesion":0.000454102},{"frame":70,"pressure":0.01323,"viscosity":0.00205919,"surfaceTension":0.000608184,"adhesion":0.000463555},{"frame":71,"pressure":0.01323,"viscosity":0.00124806,"surfaceTension":0.0006452,"adhesion":0.000447443},{"frame":72,"pressure":0.01323,"viscosity":0.00165445,"surfaceTension":0.000694305,"adhesion":0.000450177},{"frame":73,"pressure":0.01323,"viscosity":0.00106676,"surfaceTension":0.000632931,"adhesion":0.000443142},{"frame":74,"pressure":0.01323,"viscosity":0.0017319,"surfaceTension":0.000610192,"adhesion":0.00045108},{"frame":75,"pressure":0.01323,"viscosity":0.00143648,"surfaceTension":0.000659,"adhesion":0.000448346},{"frame":76,"pressure":0.01323,"viscosity":0.00164468,"surfaceTension":0.000699311,"adhesion":0.000454096},{"frame":77,"pressure":0.01323,"viscosity":0.00152343,"surfaceTension":0.000609448,"adhesion":0.000452292},{"frame":78,"pressure":0.01323,"viscosity":0.00098315,"surfaceTension":0.000658248,"adhesion":0.000459469},{"frame":79,"pressure":0.01323,"viscosity":0.000916916,"surfaceTension":0.000612138,"adhesion":0.000461181},{"frame":80,"pressure":0.01323,"viscosity":0.00143358,"surfaceTension":0.000632591,"adhesion":0.00046245},{"frame":81,"pressure":0.01323,"viscosity":0.0011212,"surfaceTension":0.000646114,"adhesion":0.000447168},{"frame":82,"pressure":0.01323,"viscosity":0.00120103,"surfaceTension":0.000603099,"adhesion":0.000460852},{"frame":83,"pressure":0.01323,"viscosity":0.00112017,"surfaceTension":0.000597937,"adhesion":0.000453519},{"frame":84,"pressure":0.01323,"viscosity":0.0011141,"surfaceTension":0.000690837,"adhesion":0.000459652},{"frame":85,"pressure":0.01323,"viscosity":0.00154975,"surfaceTension":0.000642372,"adhesion":0.000464194},{"frame":86,"pressure":0.01323,"viscosity":0.00119783,"surfaceTension":0.000618649,"adhesion":0.000455202},{"frame":87,"pressure":0.01323,"viscosity":0.00117233,"surfaceTension":0.000690623,"adhesion":0.000444651},{"frame":88,"pressure":0.01323,"viscosity":0.00153305,"surfaceTension":0.000633976,"adhesion":0.000454897},{"frame":89,"pressure":0.01323,"viscosity":0.000994972,"surfaceTension":0.000644301,"adhesion":0.000456444},{"frame":90,"pressure":0.01323,"viscosity":0.00140502,"surfaceTension":0.000688537,"adhesion":0.000463162},{"frame":91,"pressure":0.01323,"viscosity":0.0013018,"surfaceTension":0.000628852,"adhesion":0.00045482},{"frame":92,"pressure":0.01323,"viscosity":0.00105489,"surfaceTension":0.000705749,"adhesion":0.000462454},{"frame":93,"pressure":0.01323,"viscosity":0.00158674,"surfaceTension":0.000607518,"adhesion":0.00045918},{"frame":94,"pressure":0.01323,"viscosity":0.00144375,"surfaceTension":0.000637209,"adhesion":0.000456361},{"frame":95,"pressure":0.01323,"viscosity":0.00103819,"surfaceTension":0.000677179,"adhesion":0.000453093},{"frame":96,"pressure":0.01323,"viscosity":0.000902825,"surfaceTension":0.000603892,"adhesion":0.000457818},{"frame":97,"pressure":0.01323,"viscosity":0.00116275,"surfaceTension":0.00058436,"adhesion":0.000458422},{"frame":98,"pressure":0.01323,"viscosity":0.00108292,"surfaceTension":0.000627109,"adhesion":0.000460232},{"frame":99,"pressure":0.01323,"viscosity":0.000848632,"surfaceTension":0.000677954,"adhesion":0.000468854},{"frame":100,"pressure":0.01323,"viscosity":0.00106899,"surfaceTension":0.000668288,"adhesion":0.000464975},{"frame":101,"pressure":0.01323,"viscosity":0.00129597,"surfaceTension":0.000680357,"adhesion":0.00044804},{"frame":102,"pressure":0.01323,"viscosity":0.00112111,"surfaceTension":0.00064831,"adhesion":0.000459812},{"frame":103,"pressure":0.01323,"viscosity":0.00162789,"surfaceTension":0.000674395,"adhesion":0.000452337},{"frame":104,"pressure":0.01323,"viscosity":0.00123616,"surfaceTension":0.000628084,"adhesion":0.000448206},{"frame":105,"pressure":0.01323,"viscosity":0.000810646,"surfaceTension":0.00058652,"adhesion":0.000454023},{"frame":106,"pressure":0.01323,"viscosity":0.000992412,"surfaceTension":0.000654557,"adhesion":0.000463008},{"frame":107,"pressure":0.01323,"viscosity":0.00108821,"surfaceTension":0.000673146,"adhesion":0.000454463},{"frame":108,"pressure":0.01323,"viscosity":0.000898066,"surfaceTension":0.000664766,"adhesion":0.000448523},{"frame":109,"pressure":0.01323,"viscosity":0.000830873,"surfaceTension":0.000584791,"adhesion":0.000463991},{"frame":110,"pressure":0.01323,"viscosity":0.00115355,"surfaceTension":0.000652705,"adhesion":0.000450659},{"frame":111,"pressure":0.01323,"viscosity":0.00154176,"surfaceTension":0.000639206,"adhesion":0.000456421},{"frame":112,"pressure":0.01323,"viscosity":0.00130606,"surfaceTension":0.000694653,"adhesion":0.000459371},{"frame":113,"pressure":0.01323,"viscosity":0.00144551,"surfaceTension":0.000647492,"adhesion":0.000463882},{"frame":114,"pressure":0.01323,"viscosity":0.000865241,"surfaceTension":0.000683794,"adhesion":0.000458317},{"frame":115,"pressure":0.01323,"viscosity":0.000859427,"surfaceTension":0.000572727,"adhesion":0.000456419},{"frame":116,"pressure":0.01323,"viscosity":0.00111776,"surfaceTension":0.000693785,"adhesion":0.000453376},{"frame":117,"pressure":0.01323,"viscosity":0.00225933,"surfaceTension":0.000633063,"adhesion":0.0004544},{"frame":118,"pressure":0.01323,"viscosity":0.00112961,"surfaceTension":0.000610523,"adhesion":0.000458549},{"frame":119,"pressure":0.01323,"viscosity":0.001076,"surfaceTension":0.000567817,"adhesion":0.000451808},{"frame":120,"pressure":0.01323,"viscosity":0.00120926,"surfaceTension":0.000698531,"adhesion":0.000455925},{"frame":121,"pressure":0.01323,"viscosity":0.00126527,"surfaceTension":0.000653874,"adhesion":0.000452493},{"frame":122,"pressure":0.01323,"viscosity":0.0013469,"surfaceTension":0.000581103,"adhesion":0.000450497},{"frame":123,"pressure":0.01323,"viscosity":0.000808758,"surfaceTension":0.000647985,"adhesion":0.000456589},{"frame":124,"pressure":0.01323,"viscosity":0.000916146,"surfaceTension":0.000639953,"adhesion":0.000453895},{"frame":125,"pressure":0.01323,"viscosity":0.00124898,"surfaceTension":0.000587509,"adhesion":0.00046003},{"frame":126,"pressure":0.01323,"viscosity":0.00140969,"surfaceTension":0.000700343,"adhesion":0.000450119},{"frame":127,"pressure":0.01323,"viscosity":0.000913808,"surfaceTension":0.000646585,"adhesion":0.000454819},{"frame":128,"pressure":0.01323,"viscosity":0.00117178,"surfaceTension":0.000657796,"adhesion":0.000465498},{"frame":129,"pressure":0.01323,"viscosity":0.00101365,"surfaceTension":0.000588037,"adhesion":0.000462949},{"frame":130,"pressure":0.01323,"viscosity":0.000777672,"surfaceTension":0.000614987,"adhesion":0.000457651},{"frame":131,"pressure":0.01323,"viscosity":0.000951854,"surfaceTension":0.000626559,"adhesion":0.000462844},{"frame":132,"pressure":0.01323,"viscosity":0.00090074,"surfaceTension":0.000670501,"adhesion":0.000454428},{"frame":133,"pressure":0.01323,"viscosity":0.00105739,"surfaceTension":0.000652926,"adhesion":0.000447726},{"frame":134,"pressure":0.01323,"viscosity":0.00124492,"surfaceTension":0.000653127,"adhesion":0.000460579},{"frame":135,"pressure":0.01323,"viscosity":0.000833466,"surfaceTension":0.000641654,"adhesion":0.000461597},{"frame":136,"pressure":0.01323,"viscosity":0.000981173,"surfaceTension":0.000647864,"adhesion":0.000458803},{"frame":137,"pressure":0.01323,"viscosity":0.000933541,"surfaceTension":0.000612077,"adhesion":0.000459292},{"frame":138,"pressure":0.01323,"viscosity":0.000961423,"surfaceTension":0.000646019,"adhesion":0.000450855},{"frame":139,"pressure":0.01323,"viscosity":0.000908533,"surfaceTension":0.000610944,"adhesion":0.000447684},{"frame":140,"pressure":0.01323,"viscosity":0.000711225,"surfaceTension":0.000589756,"adhesion":0.000452967},{"frame":141,"pressure":0.01323,"viscosity":0.00136278,"surfaceTension":0.000631277,"adhesion":0.000464432},{"frame":142,"pressure":0.01323,"viscosity":0.000976055,"surfaceTension":0.000634753,"adhesion":0.000448289},{"frame":143,"pressure":0.01323,"viscosity":0.00111459,"surfaceTension":0.000685994,"adhesion":0.000457571},{"frame":144,"pressure":0.01323,"viscosity":0.00116481,"surfaceTension":0.000586584,"adhesion":0.000454278},{"frame":145,"pressure":0.01323,"viscosity":0.000926103,"surfaceTension":0.000624602,"adhesion":0.000459158},{"frame":146,"pressure":0.01323,"viscosity":0.000856182,"surfaceTension":0.000657042,"adhesion":0.000453918},{"frame":147,"pressure":0.01323,"viscosity":0.00140848,"surfaceTension":0.000683048,"adhesion":0.00045972},{"frame":148,"pressure":0.01323,"viscosity":0.00108425,"surfaceTension":0.000689806,"adhesion":0.00045842},{"frame":149,"pressure":0.01323,"viscosity":0.000884372,"surfaceTension":0.000633146,"adhesion":0.000458881},{"frame":150,"pressure":0.01323,"viscosity":0.000908743,"surfaceTension":0.000607773,"adhesion":0.00045075},{"frame":151,"pressure":0.01323,"viscosity":0.000912919,"surfaceTension":0.000619591,"adhesion":0.00045402},{"frame":152,"pressure":0.01323,"viscosity":0.000870867,"surfaceTension":0.000633817,"adhesion":0.00045379},{"frame":153,"pressure":0.01323,"viscosity":0.00100803,"surfaceTension":0.000572839,"adhesion":0.000462728},{"frame":154,"pressure":0.01323,"viscosity":0.00068938,"surfaceTension":0.000575756,"adhesion":0.000452002},{"frame":155,"pressure":0.01323,"viscosity":0.0011489,"surfaceTension":0.000585175,"adhesion":0.000461567},{"frame":156,"pressure":0.01323,"viscosity":0.000992698,"surfaceTension":0.000653122,"adhesion":0.000463078},{"frame":157,"pressure":0.01323,"viscosity":0.000932472,"surfaceTension":0.000701633,"adhesion":0.000457215},{"frame":158,"pressure":0.01323,"viscosity":0.00075056,"surfaceTension":0.000603028,"adhesion":0.000456623},{"frame":159,"pressure":0.01323,"viscosity":0.000948006,"surfaceTension":0.0006102,"adhesion":0.000454979},{"frame":160,"pressure":0.01323,"viscosity":0.00126123,"surfaceTension":0.000613108,"adhesion":0.00045442},{"frame":161,"pressure":0.01323,"viscosity":0.000727502,"surfaceTension":0.000640201,"adhesion":0.000460393},{"frame":162,"pressure":0.01323,"viscosity":0.000933066,"surfaceTension":0.000648765,"adhesion":0.000462067},{"frame":163,"pressure":0.01323,"viscosity":0.000783948,"surfaceTension":0.000612492,"adhesion":0.000456384},{"frame":164,"pressure":0.01323,"viscosity":0.000888758,"surfaceTension":0.000617519,"adhesion":0.000462867},{"frame":165,"pressure":0.01323,"viscosity":0.00143704,"surfaceTension":0.000585033,"adhesion":0.00045892},{"frame":166,"pressure":0.01323,"viscosity":0.000860013,"surfaceTension":0.000675089,"adhesion":0.000453911},{"frame":167,"pressure":0.01323,"viscosity":0.000724962,"surfaceTension":0.000633388,"adhesion":0.000455739},{"frame":168,"pressure":0.01323,"viscosity":0.000806473,"surfaceTension":0.000609915,"adhesion":0.000465879},{"frame":169,"pressure":0.01323,"viscosity":0.000834152,"surfaceTension":0.000593026,"adhesion":0.000458364},{"frame":170,"pressure":0.01323,"viscosity":0.000793137,"surfaceTension":0.000572567,"adhesion":0.00045624},{"frame":171,"pressure":0.01323,"viscosity":0.000652242,"surfaceTension":0.000631138,"adhesion":0.000453929},{"frame":172,"pressure":0.01323,"viscosity":0.000744998,"surfaceTension":0.000625092,"adhesion":0.000455114},{"frame":173,"pressure":0.01323,"viscosity":0.00100898,"surfaceTension":0.000594923,"adhesion":0.000447066},{"frame":174,"pressure":0.01323,"viscosity":0.000961389,"surfaceTension":0.000637603,"adhesion":0.000453803},{"frame":175,"pressure":0.01323,"viscosity":0.000900195,"surfaceTension":0.000602939,"adhesion":0.000460665},{"frame":176,"pressure":0.01323,"viscosity":0.00145391,"surfaceTension":0.000596052,"adhesion":0.000455892},{"frame":177,"pressure":0.01323,"viscosity":0.000938525,"surfaceTension":0.000612239,"adhesion":0.000459756},{"frame":178,"pressure":0.01323,"viscosity":0.0010995,"surfaceTension":0.000549461,"adhesion":0.000457966},{"frame":179,"pressure":0.01323,"viscosity":0.000720836,"surfaceTension":0.000553379,"adhesion":0.000463796},{"frame":180,"pressure":0.01323,"viscosity":0.000918178,"surfaceTension":0.000627516,"adhesion":0.000459691},{"frame":181,"pressure":0.01323,"viscosity":0.00084624,"surfaceTension":0.000597042,"adhesion":0.000460103},{"frame":182,"pressure":0.01323,"viscosity":0.000601124,"surfaceTension":0.00055381,"adhesion":0.000464203},{"frame":183,"pressure":0.01323,"viscosity":0.000903988,"surfaceTension":0.000640211,"adhesion":0.00045854},{"frame":184,"pressure":0.0104613,"viscosity":0.000671531,"surfaceTension":0.000664762,"adhesion":0.000455322},{"frame":185,"pressure":0.01323,"viscosity":0.00123193,"surfaceTension":0.000578024,"adhesion":0.000461619},{"frame":186,"pressure":0.01323,"viscosity":0.00081688,"surfaceTension":0.000568434,"adhesion":0.000463494},{"frame":187,"pressure":0.01323,"viscosity":0.000658248,"surfaceTension":0.000580864,"adhesion":0.000465431},{"frame":188,"pressure":0.01323,"viscosity":0.000867707,"surfaceTension":0.000567205,"adhesion":0.000464285},{"frame":189,"pressure":0.01323,"viscosity":0.000957748,"surfaceTension":0.000539186,"adhesion":0.000453523},{"frame":190,"pressure":0.01323,"viscosity":0.000860473,"surfaceTension":0.000609235,"adhesion":0.000459409},{"frame":191,"pressure":0.01323,"viscosity":0.000732618,"surfaceTension":0.000569959,"adhesion":0.000458282},{"frame":192,"pressure":0.01323,"viscosity":0.000919191,"surfaceTension":0.000672519,"adhesion":0.000459186},{"frame":193,"pressure":0.01323,"viscosity":0.00097501,"surfaceTension":0.000575333,"adhesion":0.000450625},{"frame":194,"pressure":0.01323,"viscosity":0.00110532,"surfaceTension":0.000568283,"adhesion":0.000451627},{"frame":195,"pressure":0.01323,"viscosity":0.000777416,"surfaceTension":0.000583746,"adhesion":0.000462082},{"frame":196,"pressure":0.01323,"viscosity":0.00138029,"surfaceTension":0.000576465,"adhesion":0.000454538},{"frame":197,"pressure":0.01323,"viscosity":0.000870646,"surfaceTension":0.000578937,"adhesion":0.000456739},{"frame":198,"pressure":0.01323,"viscosity":0.000854559,"surfaceTension":0.000590671,"adhesion":0.000456586},{"frame":199,"pressure":0.01323,"viscosity":0.000603242,"surfaceTension":0.000565784,"adhesion":0.000468051},{"frame":200,"pressure":0.01323,"viscosity":0.000879635,"surfaceTension":0.000577162,"adhesion":0.000469353},{"frame":201,"pressure":0.01323,"viscosity":0.000867873,"surfaceTension":0.000627847,"adhesion":0.00045487},{"frame":202,"pressure":0.01323,"viscosity":0.000806139,"surfaceTension":0.000569923,"adhesion":0.000462138},{"frame":203,"pressure":0.01323,"viscosity":0.000778128,"surfaceTension":0.000625293,"adhesion":0.000454685},{"frame":204,"pressure":0.01323,"viscosity":0.00095483,"surfaceTension":0.000574275,"adhesion":0.000451902},{"frame":205,"pressure":0.01323,"viscosity":0.000635765,"surfaceTension":0.000591448,"adhesion":0.000447981},{"frame":206,"pressure":0.01323,"viscosity":0.0010535,"surfaceTension":0.000564529,"adhesion":0.000465512},{"frame":207,"pressure":0.01323,"viscosity":0.000770752,"surfaceTension":0.000579017,"adhesion":0.000457129},{"frame":208,"pressure":0.01323,"viscosity":0.00126927,"surfaceTension":0.000607529,"adhesion":0.00045877},{"frame":209,"pressure":0.01323,"viscosity":0.000806454,"surfaceTension":0.000602064,"adhesion":0.000461277},{"frame":210,"pressure":0.01323,"viscosity":0.00111225,"surfaceTension":0.000617805,"adhesion":0.00047043},{"frame":211,"pressure":0.01323,"viscosity":0.00109289,"surfaceTension":0.000597289,"adhesion":0.000455332},{"frame":212,"pressure":0.01323,"viscosity":0.00111337,"surfaceTension":0.000608961,"adhesion":0.000457109},{"frame":213,"pressure":0.01323,"viscosity":0.000832455,"surfaceTension":0.000585944,"adhesion":0.000462445},{"frame":214,"pressure":0.01323,"viscosity":0.000700756,"surfaceTension":0.0005999,"adhesion":0.000463265},{"frame":215,"pressure":0.01323,"viscosity":0.000630393,"surfaceTension":0.000554522,"adhesion":0.000457561},{"frame":216,"pressure":0.01323,"viscosity":0.000812233,"surfaceTension":0.000599225,"adhesion":0.000453151},{"frame":217,"pressure":0.01323,"viscosity":0.000978286,"surfaceTension":0.000612415,"adhesion":0.000454336},{"frame":218,"pressure":0.01323,"viscosity":0.000904224,"surfaceTension":0.000569268,"adhesion":0.000466166},{"frame":219,"pressure":0.01323,"viscosity":0.000894407,"surfaceTension":0.000576341,"adhesion":0.000457886},{"frame":220,"pressure":0.01323,"viscosity":0.00102628,"surfaceTension":0.000560411,"adhesion":0.000455525},{"frame":221,"pressure":0.01323,"viscosity":0.000749765,"surfaceTension":0.000556921,"adhesion":0.000451745},{"frame":222,"pressure":0.01323,"viscosity":0.0008756,"surfaceTension":0.00058213,"adhesion":0.000462814},{"frame":223,"pressure":0.01323,"viscosity":0.000928506,"surfaceTension":0.000570762,"adhesion":0.000456949},{"frame":224,"pressure":0.01323,"viscosity":0.000940986,"surfaceTension":0.000574275,"adhesion":0.000463728},{"frame":225,"pressure":0.01323,"viscosity":0.000940699,"surfaceTension":0.000548652,"adhesion":0.000465836},{"frame":226,"pressure":0.01323,"viscosity":0.000924199,"surfaceTension":0.000580711,"adhesion":0.000466035},{"frame":227,"pressure":0.01323,"viscosity":0.000777699,"surfaceTension":0.000597833,"adhesion":0.000452503},{"frame":228,"pressure":0.01323,"viscosity":0.000925101,"surfaceTension":0.000697928,"adhesion":0.000463351},{"frame":229,"pressure":0.01323,"viscosity":0.000736042,"surfaceTension":0.00058359,"adhesion":0.000449711},{"frame":230,"pressure":0.01323,"viscosity":0.000951629,"surfaceTension":0.000546615,"adhesion":0.000456035},{"frame":231,"pressure":0.01323,"viscosity":0.000606184,"surfaceTension":0.000548961,"adhesion":0.000456509},{"frame":232,"pressure":0.01323,"viscosity":0.000736378,"surfaceTension":0.000585092,"adhesion":0.00045057},{"frame":233,"pressure":0.01323,"viscosity":0.00072581,"surfaceTension":0.000544406,"adhesion":0.000448842},{"frame":234,"pressure":0.01323,"viscosity":0.00064138,"surfaceTension":0.000555853,"adhesion":0.000460846},{"frame":235,"pressure":0.01323,"viscosity":0.000776989,"surfaceTension":0.000621686,"adhesion":0.000464233},{"frame":236,"pressure":0.01323,"viscosity":0.00110405,"surfaceTension":0.000617646,"adhesion":0.000464917},{"frame":237,"pressure":0.01323,"viscosity":0.000830381,"surfaceTension":0.000574576,"adhesion":0.000454194},{"frame":238,"pressure":0.01323,"viscosity":0.000998808,"surfaceTension":0.000556698,"adhesion":0.000458278},{"frame":239,"pressure":0.01323,"viscosity":0.000735534,"surfaceTension":0.000547133,"adhesion":0.000456086},{"frame":240,"pressure":0.01323,"viscosity":0.000826778,"surfaceTension":0.00052757,"adhesion":0.000462649}];
 
+// Adhesion比較用（モジュールレベルで1回だけ生成）
+const COMPARE_AD = RAW.map((d, i) => ({
+  frame: d.frame,
+  orig: d.adhesion ?? null,
+  x10: (RAW_X10[i]?.adhesion > 0) ? RAW_X10[i].adhesion : null,
+}));
+
+// ── 定数 ──────────────────────────────────────────────────────────────────────
 const SERIES = [
-  { key: "pressure",      label: "Pressure",       color: "#e74c3c" },
-  { key: "viscosity",     label: "Viscosity",       color: "#3498db" },
-  { key: "surfaceTension",label: "Surface Tension", color: "#2ecc71" },
-  { key: "adhesion",      label: "Adhesion",        color: "#f39c12" },
+  { key: "pressure",       label: "Pressure",       color: "#e74c3c" },
+  { key: "viscosity",      label: "Viscosity",       color: "#3498db" },
+  { key: "surfaceTension", label: "Surface Tension", color: "#2ecc71" },
+  { key: "adhesion",       label: "Adhesion",        color: "#f39c12" },
 ];
 
+// ── ヘルパー ──────────────────────────────────────────────────────────────────
 function fmt(v) {
-  if (v == null) return "—";
+  if (v == null || !isFinite(v) || isNaN(v)) return "—";
   if (Math.abs(v) >= 0.001) return v.toFixed(5);
   return v.toExponential(3);
 }
 
+const logTick = (v) => {
+  if (!v || !isFinite(v)) return "";
+  const e = Math.log10(v);
+  return Number.isInteger(Math.round(e)) ? `10^${Math.round(e)}` : "";
+};
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
+  const valid = payload.filter(p => p && p.value != null && isFinite(p.value));
+  if (!valid.length) return null;
   return (
-    <div style={{
-      background: "#1a1a2e", border: "1px solid #444", borderRadius: 8,
-      padding: "10px 14px", fontSize: 12, color: "#eee", minWidth: 210
-    }}>
-      <div style={{ fontWeight: 700, marginBottom: 6, color: "#aef" }}>Frame {label}</div>
-      {payload.map(p => (
-        <div key={p.dataKey} style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 2 }}>
-          <span style={{ color: p.color }}>{p.name}</span>
-          <span style={{ fontFamily: "monospace" }}>{fmt(p.value)}</span>
+    <div style={{ background:"#1a1a2e", border:"1px solid #444", borderRadius:8,
+                   padding:"10px 14px", fontSize:12, color:"#eee", minWidth:210 }}>
+      <div style={{ fontWeight:700, marginBottom:6, color:"#aef" }}>Frame {label}</div>
+      {valid.map(p => (
+        <div key={p.dataKey} style={{ display:"flex", justifyContent:"space-between",
+                                       gap:16, marginBottom:2 }}>
+          <span style={{ color:p.color }}>{p.name}</span>
+          <span style={{ fontFamily:"monospace" }}>{fmt(p.value)}</span>
         </div>
       ))}
-
-      {/* ── 比較実験セクション ─────────────────────────────────────── */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 12,
-        margin: "28px 0 16px", padding: "0 4px"
-      }}>
-        <div style={{ flex: 1, height: 1, background: "#2a2a4a" }} />
-        <span style={{ fontSize: 13, color: "#7ecfff", fontWeight: 700, whiteSpace: "nowrap" }}>
-          比較実験 — Adhesion係数 × 10　(ADHESION_BETA: 0.3 → 3)
-        </span>
-        <div style={{ flex: 1, height: 1, background: "#2a2a4a" }} />
-      </div>
-
-      {/* Panel 3: Adhesion 比較 */}
-      <div style={{
-        background: "#161628", borderRadius: 12, padding: "14px 8px 8px",
-        marginBottom: 16, border: "1px solid #2a2a4a"
-      }}>
-        <div style={{ fontSize: 13, color: "#aef", fontWeight: 600, marginLeft: 48, marginBottom: 4 }}>
-          Adhesion 比較 — オリジナル（点線）vs ×10（実線） | 対数スケール
-        </div>
-        <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={COMPARE_AD} margin={{ top: 4, right: 20, bottom: 4, left: 16 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
-            <XAxis dataKey="frame" tick={{ fill: "#888", fontSize: 11 }}
-              label={{ value: "Frame", position: "insideBottom", offset: -2, fill: "#888", fontSize: 11 }} />
-            <YAxis scale="log" domain={[1e-6, 1e-2]}
-              tickFormatter={logTickFormatter}
-              tick={{ fill: "#888", fontSize: 10 }}
-              label={{ value: "Adhesion", angle: -90, position: "insideLeft", fill: "#888", fontSize: 11 }} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 12, color: "#ccc", paddingTop: 6 }} />
-            <Line type="monotone" dataKey="orig" name="Adhesion (orig)"
-              stroke="#f39c12" strokeWidth={1.5} strokeDasharray="5 3" dot={false} connectNulls={false} />
-            <Line type="monotone" dataKey="x10" name="Adhesion ×10"
-              stroke="#fd79a8" strokeWidth={2.0} dot={false} connectNulls={false} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Toggle for x10 forces panel */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
-        {SERIES.map(s => (
-          <button key={s.key} onClick={() => toggleX10(s.key)} style={{
-            padding: "4px 14px", borderRadius: 20, border: `2px solid ${s.color}`,
-            background: visibleX10[s.key] ? s.color + "33" : "transparent",
-            color: visibleX10[s.key] ? s.color : "#555", cursor: "pointer",
-            fontSize: 12, fontWeight: 600, transition: "all 0.2s",
-            opacity: 0.85,
-          }}>{s.label} ×10</button>
-        ))}
-      </div>
-
-      {/* Panel 4: x10 全力 */}
-      <div style={{
-        background: "#161628", borderRadius: 12, padding: "14px 8px 8px",
-        border: "1px solid #2a2a4a"
-      }}>
-        <div style={{ fontSize: 13, color: "#aef", fontWeight: 600, marginLeft: 48, marginBottom: 4 }}>
-          |F|max — Adhesion ×10 ラン | 対数スケール
-        </div>
-        <ResponsiveContainer width="100%" height={320}>
-          <LineChart data={RAW_X10} margin={{ top: 4, right: 20, bottom: 4, left: 16 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
-            <XAxis dataKey="frame" tick={{ fill: "#888", fontSize: 11 }}
-              label={{ value: "Frame", position: "insideBottom", offset: -2, fill: "#888", fontSize: 11 }} />
-            <YAxis scale="log" domain={[1e-6, 0.1]}
-              tickFormatter={logTickFormatter}
-              tick={{ fill: "#888", fontSize: 10 }}
-              label={{ value: "|F|max", angle: -90, position: "insideLeft", fill: "#888", fontSize: 11 }} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 12, color: "#ccc", paddingTop: 6 }} />
-            {SERIES.map(s => visibleX10[s.key] && (
-              <Line key={s.key} type="monotone" dataKey={s.key} name={`${s.label} ×10`}
-                stroke={s.color} strokeWidth={1.8} dot={false} connectNulls={false} />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* x10 Stats */}
-      <div style={{
-        display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-        gap: 10, marginTop: 16
-      }}>
-        {[
-          { label: "pressure ×10",      color: "#e74c3c", min: "0",       max: "0.01323" },
-          { label: "viscosity ×10",     color: "#3498db", min: "3.2e-4",  max: "7.1e-3"  },
-          { label: "surfTension ×10",   color: "#2ecc71", min: "4.3e-4",  max: "7.5e-4"  },
-          { label: "adhesion ×10",      color: "#fd79a8", min: "3.8e-4",  max: "4.7e-4"  },
-        ].map(s => (
-          <div key={s.label} style={{
-            background: "#1a1a2e", border: `1px solid ${s.color}44`,
-            borderRadius: 8, padding: "8px 12px"
-          }}>
-            <div style={{ color: s.color, fontWeight: 700, fontSize: 12, marginBottom: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 11, color: "#aaa" }}>min: <span style={{ color: "#eee" }}>{s.min}</span></div>
-            <div style={{ fontSize: 11, color: "#aaa" }}>max: <span style={{ color: "#eee" }}>{s.max}</span></div>
-          </div>
-        ))}
-      </div>
-
-      <p style={{ textAlign: "center", fontSize: 11, color: "#555", marginTop: 14 }}>
-        ※ Adhesion ×10: ADHESION_BETA 0.3→3, ADHESION_MAX_ACCEL_G_MULTIPLE 8→80 | クランプは発生せず (pre = post)
-      </p>
     </div>
   );
 };
 
-const logTickFormatter = (v) => {
-  const exp = Math.log10(v);
-  if (Number.isInteger(Math.round(exp))) return `10^${Math.round(exp)}`;
-  return "";
-};
+const CardPanel = ({ title, children }) => (
+  <div style={{ background:"#161628", borderRadius:12, padding:"14px 8px 8px",
+                 marginBottom:16, border:"1px solid #2a2a4a" }}>
+    <div style={{ fontSize:13, color:"#aef", fontWeight:600, marginLeft:48, marginBottom:4 }}>
+      {title}
+    </div>
+    {children}
+  </div>
+);
 
+// ── メインコンポーネント ───────────────────────────────────────────────────────
 export default function SimChart() {
-  const [visible, setVisible] = useState({
-    pressure: true, viscosity: true, surfaceTension: true, adhesion: true
-  });
+  const [visible,    setVisible]    = useState({ pressure:true, viscosity:true, surfaceTension:true, adhesion:true });
+  const [visibleX10, setVisibleX10] = useState({ pressure:true, viscosity:true, surfaceTension:true, adhesion:true });
 
-  const toggle = (key) => setVisible(v => ({ ...v, [key]: !v[key] }));
-  const [visibleX10, setVisibleX10] = useState({
-    pressure: true, viscosity: true, surfaceTension: true, adhesion: true
-  });
-  const toggleX10 = (key) => setVisibleX10(v => ({ ...v, [key]: !v[key] }));
+  const toggle    = k => setVisible(v    => ({ ...v,    [k]: !v[k]    }));
+  const toggleX10 = k => setVisibleX10(v => ({ ...v,    [k]: !v[k]    }));
 
-  // Merge original + x10 adhesion for comparison chart (align by frame index)
-  const COMPARE_AD = RAW.map((d, i) => ({
-    frame: d.frame,
-    orig: d.adhesion,
-    x10: RAW_X10[i]?.adhesion ?? null,
-  }));
-
+  const XAXIS = { tick:{ fill:"#888", fontSize:11 },
+                   label:{ value:"Frame", position:"insideBottom", offset:-2, fill:"#888", fontSize:11 } };
+  const YLOG  = { scale:"log", tickFormatter:logTick, tick:{ fill:"#888", fontSize:10 },
+                   allowDataOverflow:true };
 
   return (
-    <div style={{
-      background: "#0f0f1a", minHeight: "100vh", color: "#eee",
-      fontFamily: "'Segoe UI', sans-serif", padding: "20px 16px"
-    }}>
-      <h2 style={{ textAlign: "center", margin: "0 0 4px", fontSize: 18, color: "#7ecfff", letterSpacing: 1 }}>
+    <div style={{ background:"#0f0f1a", minHeight:"100vh", color:"#eee",
+                   fontFamily:"'Segoe UI',sans-serif", padding:"20px 16px" }}>
+
+      {/* タイトル */}
+      <h2 style={{ textAlign:"center", margin:"0 0 4px", fontSize:18, color:"#7ecfff", letterSpacing:1 }}>
         SPH流体シミュレーション (240 frames)
       </h2>
-      <p style={{ textAlign: "center", margin: "0 0 18px", fontSize: 12, color: "#888" }}>
+      <p style={{ textAlign:"center", margin:"0 0 18px", fontSize:12, color:"#888" }}>
         PCISPH + Monaghan粘性 + 適応タイムステップ
       </p>
 
-      {/* Toggle buttons */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
+      {/* トグル（元データ） */}
+      <div style={{ display:"flex", justifyContent:"center", gap:10, marginBottom:10, flexWrap:"wrap" }}>
         {SERIES.map(s => (
           <button key={s.key} onClick={() => toggle(s.key)} style={{
-            padding: "4px 14px", borderRadius: 20, border: `2px solid ${s.color}`,
-            background: visible[s.key] ? s.color + "33" : "transparent",
-            color: visible[s.key] ? s.color : "#555", cursor: "pointer",
-            fontSize: 12, fontWeight: 600, transition: "all 0.2s"
+            padding:"4px 14px", borderRadius:20, border:`2px solid ${s.color}`,
+            background: visible[s.key] ? s.color+"33" : "transparent",
+            color: visible[s.key] ? s.color : "#555",
+            cursor:"pointer", fontSize:12, fontWeight:600, transition:"all 0.2s"
           }}>{s.label}</button>
         ))}
       </div>
 
-      {/* Chart 1: Density (max) — linear */}
-      <div style={{
-        background: "#161628", borderRadius: 12, padding: "14px 8px 8px",
-        marginBottom: 16, border: "1px solid #2a2a4a"
-      }}>
-        <div style={{ fontSize: 13, color: "#aef", fontWeight: 600, marginLeft: 48, marginBottom: 4 }}>
-          密度 max（density_max） — 線形スケール
-        </div>
+      {/* Panel 1: 密度 */}
+      <CardPanel title="密度 max（density_max） — 線形スケール">
         <ResponsiveContainer width="100%" height={210}>
-          <LineChart data={RAW} margin={{ top: 4, right: 20, bottom: 4, left: 12 }}>
+          <LineChart data={RAW} margin={{ top:4, right:20, bottom:4, left:12 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
-            <XAxis dataKey="frame" tick={{ fill: "#888", fontSize: 11 }}
-              label={{ value: "Frame", position: "insideBottom", offset: -2, fill: "#888", fontSize: 11 }} />
-            <YAxis domain={[600, 1500]} tick={{ fill: "#888", fontSize: 11 }}
-              label={{ value: "density", angle: -90, position: "insideLeft", fill: "#888", fontSize: 11 }} />
+            <XAxis dataKey="frame" {...XAXIS} />
+            <YAxis domain={[600, 1500]} tick={{ fill:"#888", fontSize:11 }}
+              label={{ value:"density", angle:-90, position:"insideLeft", fill:"#888", fontSize:11 }} />
             <Tooltip content={<CustomTooltip />} />
             <ReferenceLine y={1000} stroke="#556" strokeDasharray="5 3"
-              label={{ value: "REST=1000", fill: "#888", fontSize: 10, position: "right" }} />
+              label={{ value:"REST=1000", fill:"#888", fontSize:10, position:"right" }} />
             <Line type="monotone" dataKey="density_max" name="density_max"
-              stroke="#a855f7" strokeWidth={1.5} dot={false} connectNulls />
+              stroke="#a855f7" strokeWidth={1.5} dot={false}
+              isAnimationActive={false} connectNulls />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </CardPanel>
 
-      {/* Chart 2: Forces — log scale */}
-      <div style={{
-        background: "#161628", borderRadius: 12, padding: "14px 8px 8px",
-        border: "1px solid #2a2a4a"
-      }}>
-        <div style={{ fontSize: 13, color: "#aef", fontWeight: 600, marginLeft: 48, marginBottom: 4 }}>
-          力の大きさ |F|max — 対数スケール（frame 0–5は一部ゼロのため非表示）
-        </div>
+      {/* Panel 2: 力（元データ、対数） */}
+      <CardPanel title="力の大きさ |F|max — 対数スケール（frame 0–5は一部ゼロのため非表示）">
         <ResponsiveContainer width="100%" height={320}>
-          <LineChart data={RAW} margin={{ top: 4, right: 20, bottom: 4, left: 16 }}>
+          <LineChart data={RAW} margin={{ top:4, right:20, bottom:4, left:16 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
-            <XAxis dataKey="frame" tick={{ fill: "#888", fontSize: 11 }}
-              label={{ value: "Frame", position: "insideBottom", offset: -2, fill: "#888", fontSize: 11 }} />
-            <YAxis scale="log" domain={[1e-6, 0.1]}
-              tickFormatter={logTickFormatter}
-              tick={{ fill: "#888", fontSize: 10 }}
-              label={{ value: "|F|max", angle: -90, position: "insideLeft", fill: "#888", fontSize: 11 }} />
+            <XAxis dataKey="frame" {...XAXIS} />
+            <YAxis {...YLOG} domain={[1e-6, 0.1]}
+              label={{ value:"|F|max", angle:-90, position:"insideLeft", fill:"#888", fontSize:11 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 12, color: "#ccc", paddingTop: 6 }} />
+            <Legend wrapperStyle={{ fontSize:12, color:"#ccc", paddingTop:6 }} />
             {SERIES.map(s => visible[s.key] && (
               <Line key={s.key} type="monotone" dataKey={s.key} name={s.label}
-                stroke={s.color} strokeWidth={1.8} dot={false} connectNulls={false} />
+                stroke={s.color} strokeWidth={1.8} dot={false}
+                isAnimationActive={false} connectNulls={false} />
             ))}
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </CardPanel>
 
-      {/* Stats summary */}
-      <div style={{
-        display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-        gap: 10, marginTop: 16
-      }}>
+      {/* Stats（元データ） */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:10, marginTop:16 }}>
         {[
-          { label: "density_max", color: "#a855f7", min: "662.3", max: "1412.4", unit: "" },
-          { label: "pressure",    color: "#e74c3c", min: "0",     max: "0.01323", unit: "" },
-          { label: "viscosity",   color: "#3498db", min: "3.2e-4", max: "4.9e-3", unit: "" },
-          { label: "surfaceTension", color: "#2ecc71", min: "4.4e-4", max: "7.5e-4", unit: "" },
-          { label: "adhesion",    color: "#f39c12", min: "0",     max: "4.7e-5",  unit: "" },
+          { label:"density_max",    color:"#a855f7", min:"662.3",  max:"1412.4" },
+          { label:"pressure",       color:"#e74c3c", min:"0",      max:"0.01323" },
+          { label:"viscosity",      color:"#3498db", min:"3.2e-4", max:"4.9e-3" },
+          { label:"surfaceTension", color:"#2ecc71", min:"4.4e-4", max:"7.5e-4" },
+          { label:"adhesion",       color:"#f39c12", min:"0",      max:"4.7e-5" },
         ].map(s => (
-          <div key={s.label} style={{
-            background: "#1a1a2e", border: `1px solid ${s.color}44`,
-            borderRadius: 8, padding: "8px 12px"
-          }}>
-            <div style={{ color: s.color, fontWeight: 700, fontSize: 12, marginBottom: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 11, color: "#aaa" }}>min: <span style={{ color: "#eee" }}>{s.min}</span></div>
-            <div style={{ fontSize: 11, color: "#aaa" }}>max: <span style={{ color: "#eee" }}>{s.max}</span></div>
+          <div key={s.label} style={{ background:"#1a1a2e", border:`1px solid ${s.color}44`,
+                                        borderRadius:8, padding:"8px 12px" }}>
+            <div style={{ color:s.color, fontWeight:700, fontSize:12, marginBottom:4 }}>{s.label}</div>
+            <div style={{ fontSize:11, color:"#aaa" }}>min: <span style={{ color:"#eee" }}>{s.min}</span></div>
+            <div style={{ fontSize:11, color:"#aaa" }}>max: <span style={{ color:"#eee" }}>{s.max}</span></div>
           </div>
         ))}
       </div>
-
-      <p style={{ textAlign: "center", fontSize: 11, color: "#555", marginTop: 14 }}>
-        ※ frame 0–5 は adhesion=0, pressure≒0 のためlog軸に非表示 | 凡例ボタンで各系列を表示/非表示切り替え可能
+      <p style={{ textAlign:"center", fontSize:11, color:"#555", marginTop:10, marginBottom:0 }}>
+        ※ frame 0–5 は adhesion=0, pressure≒0 のためlog軸に非表示 | 凡例ボタンで各系列を表示/非表示
       </p>
 
-      {/* ── 比較実験セクション ─────────────────────────────────────── */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 12,
-        margin: "28px 0 16px", padding: "0 4px"
-      }}>
-        <div style={{ flex: 1, height: 1, background: "#2a2a4a" }} />
-        <span style={{ fontSize: 13, color: "#7ecfff", fontWeight: 700, whiteSpace: "nowrap" }}>
+      {/* ────────── 比較実験セクション ────────── */}
+      <div style={{ display:"flex", alignItems:"center", gap:12, margin:"28px 0 16px" }}>
+        <div style={{ flex:1, height:1, background:"#2a2a4a" }} />
+        <span style={{ fontSize:13, color:"#7ecfff", fontWeight:700, whiteSpace:"nowrap" }}>
           比較実験 — Adhesion係数 × 10　(ADHESION_BETA: 0.3 → 3)
         </span>
-        <div style={{ flex: 1, height: 1, background: "#2a2a4a" }} />
+        <div style={{ flex:1, height:1, background:"#2a2a4a" }} />
       </div>
 
       {/* Panel 3: Adhesion 比較 */}
-      <div style={{
-        background: "#161628", borderRadius: 12, padding: "14px 8px 8px",
-        marginBottom: 16, border: "1px solid #2a2a4a"
-      }}>
-        <div style={{ fontSize: 13, color: "#aef", fontWeight: 600, marginLeft: 48, marginBottom: 4 }}>
-          Adhesion 比較 — オリジナル（点線）vs ×10（実線） | 対数スケール
-        </div>
+      <CardPanel title="Adhesion 比較 — オリジナル（点線）vs ×10（実線） | 対数スケール">
         <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={COMPARE_AD} margin={{ top: 4, right: 20, bottom: 4, left: 16 }}>
+          <LineChart data={COMPARE_AD} margin={{ top:4, right:20, bottom:4, left:16 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
-            <XAxis dataKey="frame" tick={{ fill: "#888", fontSize: 11 }}
-              label={{ value: "Frame", position: "insideBottom", offset: -2, fill: "#888", fontSize: 11 }} />
-            <YAxis scale="log" domain={[1e-6, 1e-2]}
-              tickFormatter={logTickFormatter}
-              tick={{ fill: "#888", fontSize: 10 }}
-              label={{ value: "Adhesion", angle: -90, position: "insideLeft", fill: "#888", fontSize: 11 }} />
+            <XAxis dataKey="frame" {...XAXIS} />
+            <YAxis {...YLOG} domain={[1e-6, 1e-2]}
+              label={{ value:"Adhesion", angle:-90, position:"insideLeft", fill:"#888", fontSize:11 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 12, color: "#ccc", paddingTop: 6 }} />
+            <Legend wrapperStyle={{ fontSize:12, color:"#ccc", paddingTop:6 }} />
             <Line type="monotone" dataKey="orig" name="Adhesion (orig)"
-              stroke="#f39c12" strokeWidth={1.5} strokeDasharray="5 3" dot={false} connectNulls={false} />
+              stroke="#f39c12" strokeWidth={1.5} strokeDasharray="5 3"
+              dot={false} isAnimationActive={false} connectNulls={false} />
             <Line type="monotone" dataKey="x10" name="Adhesion ×10"
-              stroke="#fd79a8" strokeWidth={2.0} dot={false} connectNulls={false} />
+              stroke="#fd79a8" strokeWidth={2.0}
+              dot={false} isAnimationActive={false} connectNulls={false} />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </CardPanel>
 
-      {/* Toggle for x10 forces panel */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
+      {/* トグル（×10） */}
+      <div style={{ display:"flex", justifyContent:"center", gap:10, marginBottom:10, flexWrap:"wrap" }}>
         {SERIES.map(s => (
           <button key={s.key} onClick={() => toggleX10(s.key)} style={{
-            padding: "4px 14px", borderRadius: 20, border: `2px solid ${s.color}`,
-            background: visibleX10[s.key] ? s.color + "33" : "transparent",
-            color: visibleX10[s.key] ? s.color : "#555", cursor: "pointer",
-            fontSize: 12, fontWeight: 600, transition: "all 0.2s",
-            opacity: 0.85,
+            padding:"4px 14px", borderRadius:20, border:`2px solid ${s.color}`,
+            background: visibleX10[s.key] ? s.color+"33" : "transparent",
+            color: visibleX10[s.key] ? s.color : "#555",
+            cursor:"pointer", fontSize:12, fontWeight:600, transition:"all 0.2s", opacity:0.85
           }}>{s.label} ×10</button>
         ))}
       </div>
 
-      {/* Panel 4: x10 全力 */}
-      <div style={{
-        background: "#161628", borderRadius: 12, padding: "14px 8px 8px",
-        border: "1px solid #2a2a4a"
-      }}>
-        <div style={{ fontSize: 13, color: "#aef", fontWeight: 600, marginLeft: 48, marginBottom: 4 }}>
-          |F|max — Adhesion ×10 | 対数スケール
-        </div>
+      {/* Panel 4: ×10 全力 */}
+      <CardPanel title="|F|max — Adhesion ×10 | 対数スケール">
         <ResponsiveContainer width="100%" height={320}>
-          <LineChart data={RAW_X10} margin={{ top: 4, right: 20, bottom: 4, left: 16 }}>
+          <LineChart data={RAW_X10} margin={{ top:4, right:20, bottom:4, left:16 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
-            <XAxis dataKey="frame" tick={{ fill: "#888", fontSize: 11 }}
-              label={{ value: "Frame", position: "insideBottom", offset: -2, fill: "#888", fontSize: 11 }} />
-            <YAxis scale="log" domain={[1e-6, 0.1]}
-              tickFormatter={logTickFormatter}
-              tick={{ fill: "#888", fontSize: 10 }}
-              label={{ value: "|F|max", angle: -90, position: "insideLeft", fill: "#888", fontSize: 11 }} />
+            <XAxis dataKey="frame" {...XAXIS} />
+            <YAxis {...YLOG} domain={[1e-6, 0.1]}
+              label={{ value:"|F|max", angle:-90, position:"insideLeft", fill:"#888", fontSize:11 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 12, color: "#ccc", paddingTop: 6 }} />
+            <Legend wrapperStyle={{ fontSize:12, color:"#ccc", paddingTop:6 }} />
             {SERIES.map(s => visibleX10[s.key] && (
               <Line key={s.key} type="monotone" dataKey={s.key} name={`${s.label} ×10`}
-                stroke={s.color} strokeWidth={1.8} dot={false} connectNulls={false} />
+                stroke={s.color} strokeWidth={1.8} dot={false}
+                isAnimationActive={false} connectNulls={false} />
             ))}
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </CardPanel>
 
-      {/* x10 Stats */}
-      <div style={{
-        display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-        gap: 10, marginTop: 16
-      }}>
+      {/* Stats（×10） */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:10, marginTop:4 }}>
         {[
-          { label: "pressure ×10",      color: "#e74c3c", min: "0",       max: "0.01323" },
-          { label: "viscosity ×10",     color: "#3498db", min: "3.2e-4",  max: "7.1e-3"  },
-          { label: "surfTension ×10",   color: "#2ecc71", min: "4.3e-4",  max: "7.5e-4"  },
-          { label: "adhesion ×10",      color: "#fd79a8", min: "3.8e-4",  max: "4.7e-4"  },
+          { label:"pressure ×10",      color:"#e74c3c", min:"0",      max:"0.01323" },
+          { label:"viscosity ×10",     color:"#3498db", min:"3.2e-4", max:"7.1e-3" },
+          { label:"surfTension ×10",   color:"#2ecc71", min:"4.3e-4", max:"7.5e-4" },
+          { label:"adhesion ×10",      color:"#fd79a8", min:"3.8e-4", max:"4.7e-4" },
         ].map(s => (
-          <div key={s.label} style={{
-            background: "#1a1a2e", border: `1px solid ${s.color}44`,
-            borderRadius: 8, padding: "8px 12px"
-          }}>
-            <div style={{ color: s.color, fontWeight: 700, fontSize: 12, marginBottom: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 11, color: "#aaa" }}>min: <span style={{ color: "#eee" }}>{s.min}</span></div>
-            <div style={{ fontSize: 11, color: "#aaa" }}>max: <span style={{ color: "#eee" }}>{s.max}</span></div>
+          <div key={s.label} style={{ background:"#1a1a2e", border:`1px solid ${s.color}44`,
+                                        borderRadius:8, padding:"8px 12px" }}>
+            <div style={{ color:s.color, fontWeight:700, fontSize:12, marginBottom:4 }}>{s.label}</div>
+            <div style={{ fontSize:11, color:"#aaa" }}>min: <span style={{ color:"#eee" }}>{s.min}</span></div>
+            <div style={{ fontSize:11, color:"#aaa" }}>max: <span style={{ color:"#eee" }}>{s.max}</span></div>
           </div>
         ))}
       </div>
-
-      <p style={{ textAlign: "center", fontSize: 11, color: "#555", marginTop: 14 }}>
-        ※ Adhesion ×10: ADHESION_BETA 0.3→3, ADHESION_MAX_ACCEL_G_MULTIPLE 8→80 | クランプは発生せず (pre = post)
+      <p style={{ textAlign:"center", fontSize:11, color:"#555", marginTop:12 }}>
+        ※ Adhesion ×10: ADHESION_BETA 0.3→3, ADHESION_MAX_ACCEL_G_MULTIPLE 8→80 | クランプ発生なし (pre = post)
       </p>
+
     </div>
   );
 }
