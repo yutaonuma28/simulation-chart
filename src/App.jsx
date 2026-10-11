@@ -1,10 +1,12 @@
 import { useState } from "react";
-import SimChart from "./SimChart";
+import SimChart       from "./SimChart";
 import StillnessChart from "./StillnessChart";
+import AdhesionChart  from "./AdhesionChart";
 
 const TABS = [
-  { id: "sim",       label: "力・密度診断",    Component: SimChart       },
-  { id: "stillness", label: "静止判定 μ比較",  Component: StillnessChart },
+  { id: "sim",       label: "力・密度診断",        Component: SimChart       },
+  { id: "stillness", label: "静止判定 — 粘性比較",  Component: StillnessChart },
+  { id: "adhesion",  label: "静止判定 — Adhesion比較", Component: AdhesionChart  },
 ];
 
 function App() {
@@ -19,6 +21,7 @@ function App() {
         padding: "10px 16px",
         background: "#0f0f1a",
         borderBottom: "1px solid #2a2a4a",
+        flexWrap: "wrap",
       }}>
         {TABS.map(t => (
           <button
